@@ -33,7 +33,6 @@ use Nette\DI\Helpers as DIHelpers;
 use Nette\PhpGenerator\ClassType as ClassTypeGenerator;
 use Nette\PhpGenerator\Helpers as GeneratorHelpers;
 use Nette\PhpGenerator\PhpLiteral;
-use Nette\Reflection\ClassType as ClassTypeReflection;
 use Nette\Utils\Validators;
 use ReflectionProperty;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
@@ -313,7 +312,6 @@ class EventsExtension extends \Nette\DI\CompilerExtension
 				continue;
 			}
 
-			/** @var \Nette\DI\Definitions\ServiceDefinition $def */
 			if ($this->isAlias($def)) {
 				continue; // alias
 			}
@@ -420,7 +418,7 @@ class EventsExtension extends \Nette\DI\CompilerExtension
 			throw new \InvalidArgumentException('Given class cannot be NULL');
 		}
 
-		$instance = ClassTypeReflection::from($class)->newInstanceWithoutConstructor();
+		$instance = (new \ReflectionClass($class))->newInstanceWithoutConstructor();
 		if (!$instance instanceof EventSubscriber) {
 			throw new \Kdyby\Events\UnexpectedValueException(sprintf('The class %s does not implement %s', $class, EventSubscriber::class));
 		}
@@ -428,4 +426,12 @@ class EventsExtension extends \Nette\DI\CompilerExtension
 		return $instance;
 	}
 
+	private static function propertyHasAnnotation(ReflectionProperty $property, string $annotation): ?bool
+	{
+		$comment = $property->getDocComment();
+
+		$exists = \strpos($comment, "@$annotation") !== FALSE;
+
+		return $exists ? !\stripos($comment, "@$annotation false") : NULL;
+	}
 }
