@@ -14,7 +14,6 @@ use ArrayIterator;
 use Doctrine\Common\EventArgs;
 use Kdyby\Events\Diagnostics\Panel;
 use Nette\Utils\Callback;
-use phpDocumentor\Reflection\Types\Mixed_;
 use Traversable;
 
 class Event implements \ArrayAccess, \IteratorAggregate, \Countable
